@@ -1,0 +1,30 @@
+{% extends "manager_app/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col">
+        <div class="card card-body">
+            <form method="get">
+                {{filters.form}}
+                <button class="btn btn-primary" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% for project in filters.qs %}
+    {% if "hicham" in project.collaborators or user == project.author %} <!-- afficher que les projet qui le concernent -->
+    <article class="media content-section">
+      <div class="media-body">
+        <div class="article-metadata">
+          <a class="mr-2" href="#">{{ project.author }}</a>
+          <small class="text-muted">{{ project.date_posted|date:"d F, Y" }}</small>
+        </div>
+        <h2><a class="article-title" href="{% url 'project-detail' project.id %}">{{ project.title }}</a></h2>
+        <p class="article-content">{{ project.content }}</p>
+      </div>
+    </article>
+    {% endif %}
+{% endfor %}
+
+{% endblock content %}

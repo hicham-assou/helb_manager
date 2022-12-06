@@ -1,0 +1,74 @@
+{% extends "manager_app/base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="/static/manager_app/styleDragDrop.css">
+<article class="media content-section">
+  <div class="media-body">
+    <div class="article-metadata">
+      <a class="mr-2" href="#">{{ object.author }}</a>
+      <small class="text-muted">{{ object.date_posted|date:"d F, Y" }}</small>
+      <!-- sera peut etre supprimer par la suite (les utilisateur ne verront que leurs project) -->
+      {% if object.author == user %}
+      <div>
+        <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'project-update' object.id %}">Update </a>
+        <a class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'project-delete' object.id %}">Delete </a>
+      </div>
+
+      {% endif %}
+    </div >
+    <h2 class="article-title">{{ object.title }}</h2>
+    <p class="article-content">{{ object.content }}</p>
+  </div>
+</article>
+<article class="media content-section">
+  <div>
+    <h1><a class="btn btn-secondary btn-sm mt-1 mb-1" > {{ object.author }} : Project manager</a></h1>
+    {% for collaborator in tabCollaborators %} <!-- verifier si le collaborateur exist dans la db -->
+      <h1><a class="btn-sm ">{{ collaborator }} : Collaborator </a></h1>
+    {% endfor %}
+  </div>
+
+</article>
+
+
+  <div class="modal" id="todo_form">
+      <div class="header">
+        <div class="title">Add Todo</div>
+        <button class="btn close-modal">&times;</button>
+      </div>
+      <div class="body">
+        <input type="text" id="todo_input" />
+        <input type="submit" value="Add Todo" id="todo_submit" />
+      </div>
+  </div>
+     <!-- todo -->
+  <div class="todo-container">
+    <div class="status" id="no_status">
+      <h1>Tasks</h1>
+      <button id="add_btn" data-target-modal="#todo_form">+ Add Task</button>
+      <div class="todo" draggable="true">
+        eat
+        <span class="close">&times;</span>
+      </div>
+      <div class="todo" draggable="true">
+        sleep
+        <span class="close">&times;</span>
+      </div>
+      <div class="todo" draggable="true">
+        play
+        <span class="close">&times;</span>
+      </div>
+    </div>
+    {% for status in tabStatus %}
+    <div class="status">
+      <div>
+          <h1>{{ status }}</h1>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div id="overlay"></div>
+  <script src="/static/js/scriptDragDrop.js"></script>
+
+
+{% endblock content %}
