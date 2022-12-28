@@ -23,9 +23,7 @@ class Project(models.Model): #creation de la table projet dans la bd
     def get_absolute_url(self):
         return reverse('project-detail', kwargs={'pk': self.pk})
 
-class GroupOfCollaborators(models.Model):
-    project = models.OneToOneField(Project, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f'{self.project.title} - {self.user.usernam} - Group'
-
+class Task(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    title_task = models.CharField(max_length=100)
+    assign_to = models.CharField(max_length=100)

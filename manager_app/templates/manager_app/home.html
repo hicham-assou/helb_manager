@@ -13,7 +13,7 @@
 </div>
 
 {% for project in filters.qs %}
-    {% if "hicham" in project.collaborators or user == project.author %} <!-- afficher que les projet qui le concernent -->
+    {% if user.username in project.collaborators or user == project.author %} <!-- afficher que les projet qui le concernent -->
     <article class="media content-section">
       <div class="media-body">
         <div class="article-metadata">

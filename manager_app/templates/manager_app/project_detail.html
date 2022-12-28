@@ -45,7 +45,7 @@
   <div class="todo-container">
     <div class="status" id="no_status">
       <h1>Tasks</h1>
-      <button id="add_btn" data-target-modal="#todo_form">+ Add Task</button>
+      <a class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'task-create' object.id %}" >+ Add Task</a>
       <div class="todo" draggable="true">
         eat
         <span class="close">&times;</span>

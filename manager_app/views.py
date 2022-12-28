@@ -1,8 +1,7 @@
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import DetailView, CreateView, UpdateView, DeleteView, ListView
-from .models import Project, User
+
+from .models import Project, User, Task
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .filter import Filter
 
@@ -20,7 +19,6 @@ def home(request):
     }
 
     return render(request, 'manager_app/home.html', context)
-
 
 class ProjectListView(LoginRequiredMixin, ListView):  # affichage de tous les projets (home.html)
     model = Project
@@ -58,6 +56,22 @@ class ProjectDetailView(DetailView):
 
 
 
+class TaskCreateView(LoginRequiredMixin, CreateView):
+    model = Task
+    fields = ['title_task', 'assign_to']
+
+    def __init__(self, *args, **kwargs):
+        # Récupérez l'ID du projet à partir des arguments de la vue
+        project_id = kwargs['project_id']
+
+        # Récupérez le projet en utilisant l'ID
+        project = Project.objects.get(pk=project_id)
+
+        # Récupérez tous les collaborateurs du projet
+        collaborators = project.collaborators.all()
+
+        # Définissez le queryset pour le champ "assign_to" en utilisant les collaborateurs récupérés
+        self.fields['assign_to'].queryset = collaborators
 
 
 class ProjectCreateView(LoginRequiredMixin, CreateView):
@@ -84,6 +98,10 @@ class ProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return False
 
 
+
+    def form_valid(self, form):
+        return super().form_valid(form)
+
 class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Project
     success_url = '/'
@@ -96,3 +114,5 @@ class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 def about(request):
     return render(request, 'manager_app/about.html')
+
+

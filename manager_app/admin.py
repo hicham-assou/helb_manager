@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import Project, GroupOfCollaborators
+from .models import Project, Task
 
 # Register your models here.
 admin.site.register(Project)
-admin.site.register(GroupOfCollaborators)
+admin.site.register(Task)
