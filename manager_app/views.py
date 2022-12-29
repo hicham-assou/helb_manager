@@ -81,11 +81,12 @@ class ProjectDetailView(DetailView):
             if collaborators.find(name) != -1:
                 tabCollaborators.append(name)
             cpt=cpt+1 # pour parcourir tt ma table user
+        tabCollaborators.append(project.author.username)
         context['tabCollaborators'] = tabCollaborators
         context['users'] = users
         context['tasks'] = tasks
 
-        colors = ["red", "green", "blue", "yellow", "purple"]
+        colors = ["red", "green", "blue", "orange", "purple", "pink", "gray", "brown", "gold", "silver"]
         collaborator_colors = {}
         for collaborator in tabCollaborators:
             color = random.sample(colors, 1)[0]

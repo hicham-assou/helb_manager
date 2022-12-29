@@ -1,7 +1,8 @@
 {% extends "manager_app/base.html" %}
+{% load static %}
 {% block content %}
 
-<link rel="stylesheet" href="/static/manager_app/styleDragDrop.css">
+<link rel="stylesheet" href="{% static 'manager_app/styleDragDrop.css' %}">
 <article class="media content-section">
   <div class="media-body">
     <div class="article-metadata">
@@ -22,9 +23,17 @@
 </article>
 <article class="media content-section">
   <div>
-    <h1><a class="btn btn-secondary btn-sm mt-1 mb-1" > {{ object.author }} : Project manager</a></h1>
+    <!-- 2 fois la meme chose pour avoir le manager du projet en haut -->
     {% for collaborator, color in collaborator_colors.items %}
-      <h1 style="color: {{color}}" ><a class="btn-sm">{{ collaborator }} : Collaborator {{ color }} </a></h1>
+      {% if collaborator == object.author.username %}
+        <h1><a class="btn btn-secondary btn-sm mt-1 mb-1" style="background-color: {{color}}"> {{ object.author }} : Project manager</a></h1>
+      {% endif %}
+    {% endfor %}
+
+    {% for collaborator, color in collaborator_colors.items %}
+      {% if collaborator != object.author.username %}
+        <h1><a class="btn btn-secondary btn-sm mt-1 mb-1" style="background-color: {{color}}"> {{ collaborator }} : Collaborator</a></h1>
+      {% endif %}
     {% endfor %}
   </div>
 
@@ -46,11 +55,16 @@
     <div class="status" id="no_status">
       <h1>Tasks</h1>
       <a href="{% url 'add_task' project.id %}" class="btn btn-primary">Add Task</a>
+
       {% for task in tasks %}
-        <div class="todo" draggable="true">
-          {{ task.title_task }}
-          <span class="close">&times;</span>
-        </div>
+        {% for collaborator, color in collaborator_colors.items %}
+          {% if collaborator == task.assign_to %}
+            <div class="todo" draggable="true" style="background-color: {{color}}" >
+              {{ task.title_task }}
+              <span class="close">&times;</span>
+            </div>
+          {% endif %}
+        {% endfor %}
       {% endfor %}
     </div>
     {% for status in tabStatus %}
