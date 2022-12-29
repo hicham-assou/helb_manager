@@ -60,18 +60,9 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
     model = Task
     fields = ['title_task', 'assign_to']
 
-    def __init__(self, *args, **kwargs):
-        # Récupérez l'ID du projet à partir des arguments de la vue
-        project_id = kwargs['project_id']
-
-        # Récupérez le projet en utilisant l'ID
-        project = Project.objects.get(pk=project_id)
-
-        # Récupérez tous les collaborateurs du projet
-        collaborators = project.collaborators.all()
-
-        # Définissez le queryset pour le champ "assign_to" en utilisant les collaborateurs récupérés
-        self.fields['assign_to'].queryset = collaborators
+    def form_valid(self, form):
+        #form.instance.project = self.request.project
+        return super().form_valid(form) 
 
 
 class ProjectCreateView(LoginRequiredMixin, CreateView):
