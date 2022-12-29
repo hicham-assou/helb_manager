@@ -1,13 +1,26 @@
 from django import forms
 from .models import Task
+from .models import User
 
 class TaskForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop('project', None)
         super().__init__(*args, **kwargs)
+        # collaborateur et admin du projet
+        collaborators = self.project.collaborators
+        tabCollaborators = []
+        users = User.objects.values()
+        cpt = 0
+        for u in users:
+            name = users[cpt]['username']
+            if collaborators.find(name) != -1:
+                tabCollaborators.append(name)
+            cpt = cpt + 1  # pour parcourir tt ma table user
+        tabCollaborators.append(self.project.author.username)#rajouter le createur du projet
+
         if self.project:
-            #self.project.get_collaborators(self.project)
-            self.fields['assign_to'] = forms.ChoiceField(choices=[(collaborator, collaborator) for collaborator in self.project.collaborators.split(';')])
+            collaborators = [(collaborator, collaborator) for collaborator in tabCollaborators]
+            self.fields['assign_to'] = forms.ChoiceField(choices=collaborators)
 
     class Meta:
         model = Task

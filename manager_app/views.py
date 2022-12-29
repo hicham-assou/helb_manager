@@ -6,6 +6,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .filter import Filter
 from .forms import TaskForm
 
+import random
+
+
 
 # Create your views here.
 
@@ -26,6 +29,7 @@ def add_task(request, project_id):
     # Récupérer le projet à partir de la base de données
     project = Project.objects.get(pk=project_id)
 
+
     if request.method == 'POST':
         # Créer un formulaire lié aux données du formulaire
         form = TaskForm(request.POST, project=project)
@@ -34,6 +38,7 @@ def add_task(request, project_id):
             # Enregistrer la tâche dans la base de données
             task = form.save(commit=False)
             task.project = project
+            task.status_task = 'no status' #par defaut
             task.save()
             # Rediriger vers la page de détail du projet
             return redirect('project-detail', pk=project.pk)
@@ -55,6 +60,10 @@ class ProjectDetailView(DetailView):
     model = Project
 
     def get_context_data(self, **kwargs):
+        #taches
+        tasks = Task.objects.all()
+
+        #collaborateur et users
         project = self.get_object()
         users = User.objects.values()
         status = project.status
@@ -74,6 +83,17 @@ class ProjectDetailView(DetailView):
             cpt=cpt+1 # pour parcourir tt ma table user
         context['tabCollaborators'] = tabCollaborators
         context['users'] = users
+        context['tasks'] = tasks
+
+        colors = ["red", "green", "blue", "yellow", "purple"]
+        collaborator_colors = {}
+        for collaborator in tabCollaborators:
+            color = random.sample(colors, 1)[0]
+            collaborator_colors[collaborator] = color
+            colors.remove(color)
+
+        context['collaborator_colors'] = collaborator_colors
+
         return context
 
 

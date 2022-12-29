@@ -33,6 +33,7 @@ class Task(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     title_task = models.CharField(max_length=100)
     assign_to = models.CharField(max_length=100)
+    status_task = models.CharField(max_length=100, default='no status')
 
     def save(self, *args, **kwargs):  # method that runs after our model is saved --> méthode qui existe déjà mais on va la réécrire afin d'ajouter des fonctionnalités
         super(Task, self).save(*args, **kwargs)
