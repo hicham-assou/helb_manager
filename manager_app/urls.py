@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import ProjectDetailView, ProjectCreateView, ProjectUpdateView, ProjectDeleteView, TaskCreateView
+from .views import ProjectDetailView, ProjectCreateView, ProjectUpdateView, ProjectDeleteView
 
 urlpatterns = [
     path('', views.home, name = 'manager_app-home'), #localhost:8000/blog/
@@ -9,6 +9,6 @@ urlpatterns = [
     path('project/new/', ProjectCreateView.as_view(), name = 'project-create'),
     path('project/<int:pk>/update/', ProjectUpdateView.as_view(), name = 'project-update'),
     path('project/<int:pk>/delete/', ProjectDeleteView.as_view(), name = 'project-delete'),
-    path('project/<int:pk>/addTask/', TaskCreateView.as_view(), name = 'task-create'),
+    path('add_task/<int:project_id>/', views.add_task, name='add_task'),
 
 ]

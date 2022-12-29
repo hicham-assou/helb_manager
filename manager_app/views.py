@@ -4,6 +4,7 @@ from django.views.generic import DetailView, CreateView, UpdateView, DeleteView,
 from .models import Project, User, Task
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .filter import Filter
+from .forms import TaskForm
 
 
 # Create your views here.
@@ -20,6 +21,29 @@ def home(request):
 
     return render(request, 'manager_app/home.html', context)
 
+
+def add_task(request, project_id):
+    # Récupérer le projet à partir de la base de données
+    project = Project.objects.get(pk=project_id)
+
+    if request.method == 'POST':
+        # Créer un formulaire lié aux données du formulaire
+        form = TaskForm(request.POST, project=project)
+        # Vérifier si le formulaire est valide
+        if form.is_valid():
+            # Enregistrer la tâche dans la base de données
+            task = form.save(commit=False)
+            task.project = project
+            task.save()
+            # Rediriger vers la page de détail du projet
+            return redirect('project-detail', pk=project.pk)
+    else:
+        # Créer un formulaire vide
+        form = TaskForm(project=project)
+    # Rendre le formulaire
+    return render(request, 'manager_app/add_task.html', {'form': form})
+
+
 class ProjectListView(LoginRequiredMixin, ListView):  # affichage de tous les projets (home.html)
     model = Project
     template_name = 'manager_app/home.html'  # <app>/<model>_<viewtype>.html
@@ -33,7 +57,6 @@ class ProjectDetailView(DetailView):
     def get_context_data(self, **kwargs):
         project = self.get_object()
         users = User.objects.values()
-        print("model ==> ", users[0]['username'])
         status = project.status
         tabStatus = status.split(";")
 
@@ -43,7 +66,6 @@ class ProjectDetailView(DetailView):
         context['tabStatus'] = tabStatus
 
         tabCollaborators = []
-        print("inter ==> ",tabCollaborators)
         cpt = 0
         for u in users:
             name = users[cpt]['username']
@@ -53,16 +75,6 @@ class ProjectDetailView(DetailView):
         context['tabCollaborators'] = tabCollaborators
         context['users'] = users
         return context
-
-
-
-class TaskCreateView(LoginRequiredMixin, CreateView):
-    model = Task
-    fields = ['title_task', 'assign_to']
-
-    def form_valid(self, form):
-        #form.instance.project = self.request.project
-        return super().form_valid(form) 
 
 
 class ProjectCreateView(LoginRequiredMixin, CreateView):
