@@ -1,3 +1,4 @@
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import DetailView, CreateView, UpdateView, DeleteView, ListView
 
@@ -11,7 +12,13 @@ import random
 
 
 # Create your views here.
-
+def my_django_view(request):
+  if request.method == 'POST':
+      title = request.POST.get('title')
+      column_title = request.POST.get('columnTitle')
+      print("lest gooooooooooooooooooooooooooo")
+  else:
+      print("nike zebi")
 def home(request):
     projects = Project.objects.all()
     filters = Filter(request.GET, queryset=projects)

@@ -21,6 +21,7 @@ function dragEnd() {
     this.style.display = "block";
   }, 0);
   console.log("dragEnd");
+  alert("Hello, World!");
 }
 
 all_status.forEach((status) => {
