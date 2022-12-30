@@ -52,7 +52,10 @@
       </div>
   </div>
      <!-- todo -->
-<a href="{% url 'add_task' project.id %}" class="btn btn-primary">Add Task</a>
+  {% if object.author == user %}
+    <a href="{% url 'add_task' project.id %}" class="btn btn-secondary btn-sm mt-1 mb-1">Add Task</a>
+  {% endif %}
+
   <div class="todo-container">
 
     {% for status in tabStatus %}
@@ -61,15 +64,19 @@
           <h1>{{ status }}</h1>
       </div>
       {% for task in tasks %}
-        {% if task.status_task == status %}
-          {% for collaborator, color in collaborator_colors.items %}
-            {% if collaborator == task.assign_to %}
-              <div project_id = "{{ project.id }}" task_id = "{{ task.id }}" class="todo" draggable="true" style="background-color: {{color}}" >
-                {{ task.title_task }}
-                <span task_id = "{{ task.id }}" class="close">&times;</span>
-              </div>
-            {% endif %}
-          {% endfor %}
+        {% if task.project.id == project.id %}
+          {% if task.status_task == status %}
+            {% for collaborator, color in collaborator_colors.items %}
+              {% if collaborator == task.assign_to %}
+                <div project_id = "{{ project.id }}" task_id = "{{ task.id }}" class="todo" draggable="true" style="background-color: {{color}}" >
+                  {{ task.title_task }}
+                  {% if object.author == user %}
+                    <span task_id = "{{ task.id }}" class="close">&times;</span>
+                  {% endif %}
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
         {% endif %}
       {% endfor %}
     </div>
