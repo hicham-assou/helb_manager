@@ -181,4 +181,9 @@ class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 def about(request):
     return render(request, 'manager_app/about.html')
 
-
+def graphic_visualization(request, project_id):
+    project = Project.objects.get(id=project_id)
+    context = {
+        'project': project
+    }
+    return render(request, 'manager_app/graphic_visualization.html', context)

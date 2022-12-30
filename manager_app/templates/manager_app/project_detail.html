@@ -53,11 +53,15 @@
   </div>
      <!-- todo -->
   {% if object.author == user %}
-    <a href="{% url 'add_task' project.id %}" class="btn btn-secondary btn-sm mt-1 mb-1">Add Task</a>
+<div>
+  <a href="{% url 'add_task' project.id %}" class="btn btn-secondary btn-sm mt-1 mb-1">Add Task</a>
+  <a href="{% url 'graphic-visualization' project.id %}" class="btn btn-secondary btn-sm mt-1 mb-1">graphic visualization</a>
+</div>
+
   {% endif %}
 
+  <div id="success-message"></div>
   <div class="todo-container">
-
     {% for status in tabStatus %}
     <div class="status">
       <div>
@@ -162,8 +166,25 @@ function dragDrop() {
     console.log(data);
     alert(data)
   });
+
+  // message succes
+  showSuccessMessage('status changed successfully !', 'green');
+
+
 }
 
+function showSuccessMessage(message, color) {
+  // Afficher le message de succès
+  let successMessage = document.getElementById('success-message');
+  successMessage.textContent = message;
+  successMessage.style.backgroundColor = color;
+  successMessage.style.color = 'white';
+
+  // Masquer le message de succès au bout de 3 secondes
+  setTimeout(function() {
+    document.getElementById('success-message').innerHTML = '';
+  }, 2000);
+}
 
 /* modal */
 const btns = document.querySelectorAll("[data-target-modal]");
@@ -216,6 +237,8 @@ close_btns.forEach((btn) => {
       console.log(data);
       alert(data)
     });
+    // message succes
+    showSuccessMessage('task successfully removed !', 'red');
   });
 });
 </script>
