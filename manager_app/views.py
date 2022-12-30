@@ -1,5 +1,6 @@
 
 from django.shortcuts import render, get_object_or_404, redirect
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, CreateView, UpdateView, DeleteView, ListView
 
 from .models import Project, User, Task
@@ -8,17 +9,47 @@ from .filter import Filter
 from .forms import TaskForm
 
 import random
-
-
-
+from flask import Flask, request, render_template
+import json
+from django.http import HttpResponse
 # Create your views here.
-def my_django_view(request):
-  if request.method == 'POST':
-      title = request.POST.get('title')
-      column_title = request.POST.get('columnTitle')
-      print("lest gooooooooooooooooooooooooooo")
-  else:
-      print("nike zebi")
+
+# code Python
+@csrf_exempt
+def ma_vue(request, project_id, task_id):
+    project = Project.objects.get(id=project_id)
+    task = Task.objects.get(id=task_id)
+
+    # Vérifiez que la requête est de type POST
+    if request.method == "POST":
+        data = json.loads(request.body)
+        new_status = data["new_status"]
+
+        #transformer les status en liste de status
+        list_status = project.status.split(";")
+        list_status.append('no status')
+        for status in list_status:
+            if status in new_status:
+                new_status = status
+        print("new status => ",new_status)
+        task.status_task = new_status
+        task.save()
+
+        return HttpResponse("Données reçues avec succès")
+    else:
+        print("qqlchose s'est mal passé ")
+
+@csrf_exempt
+def delete_task(request, task_id):
+    task = Task.objects.get(id=task_id)
+
+    # Vérifiez que la requête est de type POST
+    if request.method == "POST":
+        task.delete()
+        return HttpResponse("Données reçues avec succès")
+    else:
+        print("qqlchose s'est mal passé ")
+
 def home(request):
     projects = Project.objects.all()
     filters = Filter(request.GET, queryset=projects)
@@ -74,7 +105,11 @@ class ProjectDetailView(DetailView):
         project = self.get_object()
         users = User.objects.values()
         status = project.status
-        tabStatus = status.split(";")
+
+        tabStatus = []
+        tabStatus.append('no status')
+        tabStatus += status.split(";")
+
 
         collaborators = project.collaborators
 

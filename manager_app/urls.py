@@ -10,5 +10,7 @@ urlpatterns = [
     path('project/<int:pk>/update/', ProjectUpdateView.as_view(), name = 'project-update'),
     path('project/<int:pk>/delete/', ProjectDeleteView.as_view(), name = 'project-delete'),
     path('add_task/<int:project_id>/', views.add_task, name='add_task'),
+    path('task/<int:project_id>/<int:task_id>/', views.ma_vue, name = 'ma_vue'),
+    path('task/<int:task_id>/delete_task/', views.delete_task, name = 'delete_task'),
 
 ]
