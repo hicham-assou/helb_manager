@@ -89,6 +89,29 @@ def add_task(request, project_id):
     return render(request, 'manager_app/add_task.html', {'form': form})
 
 
+def add_sub_task(request, project_id):
+    # Récupérer le projet à partir de la base de données
+    project = Project.objects.get(pk=project_id)
+
+    if request.method == 'POST':
+        # Créer un formulaire lié aux données du formulaire
+        form = SubTaskForm(request.POST, project=project)
+        # Vérifier si le formulaire est valide
+        if form.is_valid():
+            # Enregistrer la tâche dans la base de données
+            sub_task = form.save(commit=False)
+            sub_task.project = project
+            sub_task.status_task = 'no status' #par defaut
+            sub_task.save()
+
+            # Rediriger vers la page de détail du projet
+            return redirect('project-detail', pk=project.pk)
+    else:
+        # Créer un formulaire vide
+        form = SubTaskForm(project=project)
+    # Rendre le formulaire
+    return render(request, 'manager_app/add_sub_task.html', {'form': form})
+
 class ProjectListView(LoginRequiredMixin, ListView):  # affichage de tous les projets (home.html)
     model = Project
     template_name = 'manager_app/home.html'  # <app>/<model>_<viewtype>.html

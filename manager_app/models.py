@@ -25,7 +25,6 @@ class Project(models.Model): #creation de la table projet dans la bd
 
     def get_collaborators(project):
         collaborators = project.collaborators.split(';')
-        print("in projet => ", collaborators)
         return [(collaborator, collaborator) for collaborator in collaborators]
 
 
@@ -37,3 +36,10 @@ class Task(models.Model):
 
     def save(self, *args, **kwargs):  # method that runs after our model is saved --> méthode qui existe déjà mais on va la réécrire afin d'ajouter des fonctionnalités
         super(Task, self).save(*args, **kwargs)
+
+class SubTask(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    title_sub_task = models.CharField(max_length=100)
+    assign_to = models.CharField(max_length=100)
+    status_sub_task = models.CharField(max_length=100, default='no status')
