@@ -12,6 +12,7 @@ import random
 import datetime
 import json
 from django.http import HttpResponse
+import matplotlib.pyplot as plt
 # Create your views here.
 
 # code Python
@@ -67,7 +68,6 @@ def add_task(request, project_id):
     # Récupérer le projet à partir de la base de données
     project = Project.objects.get(pk=project_id)
 
-
     if request.method == 'POST':
         # Créer un formulaire lié aux données du formulaire
         form = TaskForm(request.POST, project=project)
@@ -78,6 +78,7 @@ def add_task(request, project_id):
             task.project = project
             task.status_task = 'no status' #par defaut
             task.save()
+            project_chnology(project)
 
             # Rediriger vers la page de détail du projet
             return redirect('project-detail', pk=project.pk)
@@ -147,6 +148,10 @@ class ProjectCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form): #communiquer l'auteur qui create le nouveau projet
         form.instance.author = self.request.user
+        now = datetime.datetime.now()
+        date_string = now.strftime("%d/%m/%Y")
+        with open(form.instance.title+".txt", "w") as f: #creer un fichier pour chaque nouveau projet, sert a sauvegarder la chnologie du projet
+            f.write(date_string)
         return super().form_valid(form)
 
 
@@ -183,52 +188,82 @@ def about(request):
     return render(request, 'manager_app/about.html')
 
 
-def getDates():
+def getDates(project):
     list = []
-    with open('D:\ecole\Q1-Q2-Q3-Q4\Q 3\web 2\project_chnology.txt', 'r') as f:
+    with open(project.title+'.txt', 'r') as f:
         for line in f:
             if '/' in line: #sa veut dire que cette ligne contient une date
                 list.append(line.replace('\n', ''))
     return list
 
 
-def getCountStatus(status, dates):
+def getCountStatus(project, status, dates):
     list = []
     list_elem = []
-    print("je suis la")
-    with open('D:\ecole\Q1-Q2-Q3-Q4\Q 3\web 2\project_chnology.txt', 'r') as f:
+    with open(project.title + '.txt', 'r') as f:
+        count = 0
         for line in f:
             for date in dates:
                 day_found = False
                 if date in line:
+                    count+= 1
+                    if count > 1:
+                        list.append(list_elem)
+                    list_elem = []
                     day_found = True
                     break
                 else:
                     day_found = False
 
             if day_found == False:
-                parts = line.split(':')
-                number = int(parts[-1])
-                print("nombre = ", number)
-                list_elem.append(number)
-
-
-
+                if line != '\n':
+                    parts = line.split(':')
+                    number = int(parts[-1])
+                    list_elem.append(number)
+        list.append(list_elem)
     return list
-
 
 def graphic_visualization(request, project_id):
     project = Project.objects.get(id=project_id)
-    list_date = getDates()
-    tabStatus = getStatus(project)
-    list_count_for_status = getCountStatus(tabStatus, list_date)
+    list_date = getDates(project) # ['30/12/2022', '31/12/2022']
+    print("dates", list_date)
+    tabStatus = getStatus(project) # ['no status', 'to do', ' in progress', ' done']
+    print("tabStatus", tabStatus)
+    list_count_for_status = getCountStatus(project, tabStatus, list_date) # [[5, 4, 3, 2], [2, 2, 1, 1]]
+    print("list_count_for_status", list_count_for_status)
 
-    context = {
+    draw_graph(list_date, tabStatus, list_count_for_status)
+
+    """context = {
         'project': project,
-        'status': tabStatus
-    }
-    return render(request, 'manager_app/graphic_visualization.html', context)
+        'tabstatus': tabStatus,
+        'dates': list_date,
+        'count_foreach_status': list_count_for_status
+    }"""
+    with open('graphic.pdf', 'rb') as pdf:
+        response = HttpResponse(pdf.read(), content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename='+project.title+'.pdf'
+        return response
 
+def draw_graph(dates, Status, count_for_status):
+    # Créez une figure et un axe
+    fig, ax = plt.subplots(figsize=(20, 10))
+    # Utilisez la méthode bar pour créer des barres verticales
+    # Spécifiez un intervalle entre les barres en utilisant le paramètre "width"
+    bar_width = 0.2
+    # Créez une boucle pour afficher les barres pour chaque date
+    for i, date in enumerate(dates):
+        ax.bar(Status, count_for_status[i], bar_width, label=date, align='edge')
+        Status = [' ' + s for s in Status]
+    # Ajoutez un titre et des étiquettes pour l'axe x et y
+    plt.xticks(rotation=90)
+    ax.set_title('Statut de chaque date')
+    ax.set_ylabel('Nombre de statuts')
+    ax.set_xlabel('Statut')
+    # Ajoutez une légende
+    ax.legend()
+    # Ajoutez cette ligne de code après avoir affiché le graphique
+    plt.savefig('graphic.pdf')
 
 def getStatus(project):
     status = project.status
@@ -253,15 +288,16 @@ def project_chnology(project):
 
     #traitement
     content = ""
-    with open('D:\ecole\Q1-Q2-Q3-Q4\Q 3\web 2\project_chnology.txt', 'r') as f:
+    with open(project.title + '.txt', 'r') as f:
         for line in f:
             content += line
             if date_string in line:
+                print("date trouvé")
                 break
+        print("contenu :", content)
 
 
-
-    with open('D:\ecole\Q1-Q2-Q3-Q4\Q 3\web 2\project_chnology.txt', 'w') as f:
+    with open(project.title + '.txt', 'w') as f:
         f.truncate()
         f.write(content)
 
@@ -272,4 +308,4 @@ def project_chnology(project):
                 if project == task.project:
                     if status == task.status_task:
                         count += 1
-            f.write(status+':'+str(count)+'\n')
+            f.write('\n'+ status+':'+str(count))
