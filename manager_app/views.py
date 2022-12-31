@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 # code Python
 @csrf_exempt
-def ma_vue(request, project_id, task_id):
+def status_task_update(request, project_id, task_id):
     project = Project.objects.get(id=project_id)
     task = Task.objects.get(id=task_id)
 
@@ -36,9 +36,9 @@ def ma_vue(request, project_id, task_id):
         task.save()
         project_chnology(project)
 
-        return HttpResponse("Données reçues avec succès")
+        return HttpResponse("succes")
     else:
-        print("qqlchose s'est mal passé ")
+        print("something goes wrong ")
 
 @csrf_exempt
 def delete_task(request, task_id):
@@ -47,9 +47,9 @@ def delete_task(request, task_id):
     # Vérifiez que la requête est de type POST
     if request.method == "POST":
         task.delete()
-        return HttpResponse("Données reçues avec succès")
+        return HttpResponse("succes")
     else:
-        print("qqlchose s'est mal passé ")
+        print("something goes wrong ")
 
 def home(request):
     projects = Project.objects.all()
@@ -234,12 +234,6 @@ def graphic_visualization(request, project_id):
 
     draw_graph(list_date, tabStatus, list_count_for_status)
 
-    """context = {
-        'project': project,
-        'tabstatus': tabStatus,
-        'dates': list_date,
-        'count_foreach_status': list_count_for_status
-    }"""
     with open('graphic.pdf', 'rb') as pdf:
         response = HttpResponse(pdf.read(), content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename='+project.title+'.pdf'
@@ -257,8 +251,8 @@ def draw_graph(dates, Status, count_for_status):
         Status = [' ' + s for s in Status]
     # Ajoutez un titre et des étiquettes pour l'axe x et y
     plt.xticks(rotation=90)
-    ax.set_title('Statut de chaque date')
-    ax.set_ylabel('Nombre de statuts')
+    ax.set_title('progress of the project by day')
+    ax.set_ylabel('Number of statuts')
     ax.set_xlabel('Statut')
     # Ajoutez une légende
     ax.legend()
