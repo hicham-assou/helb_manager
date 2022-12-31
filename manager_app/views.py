@@ -9,7 +9,7 @@ from .filter import Filter
 from .forms import TaskForm
 
 import random
-from flask import Flask, request, render_template
+import datetime
 import json
 from django.http import HttpResponse
 # Create your views here.
@@ -31,9 +31,9 @@ def ma_vue(request, project_id, task_id):
         for status in list_status:
             if status in new_status:
                 new_status = status
-        print("new status => ",new_status)
         task.status_task = new_status
         task.save()
+        project_chnology(project)
 
         return HttpResponse("Données reçues avec succès")
     else:
@@ -78,6 +78,7 @@ def add_task(request, project_id):
             task.project = project
             task.status_task = 'no status' #par defaut
             task.save()
+
             # Rediriger vers la page de détail du projet
             return redirect('project-detail', pk=project.pk)
     else:
@@ -181,9 +182,94 @@ class ProjectDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 def about(request):
     return render(request, 'manager_app/about.html')
 
+
+def getDates():
+    list = []
+    with open('D:\ecole\Q1-Q2-Q3-Q4\Q 3\web 2\project_chnology.txt', 'r') as f:
+        for line in f:
+            if '/' in line: #sa veut dire que cette ligne contient une date
+                list.append(line.replace('\n', ''))
+    return list
+
+
+def getCountStatus(status, dates):
+    list = []
+    list_elem = []
+    print("je suis la")
+    with open('D:\ecole\Q1-Q2-Q3-Q4\Q 3\web 2\project_chnology.txt', 'r') as f:
+        for line in f:
+            for date in dates:
+                day_found = False
+                if date in line:
+                    day_found = True
+                    break
+                else:
+                    day_found = False
+
+            if day_found == False:
+                parts = line.split(':')
+                number = int(parts[-1])
+                print("nombre = ", number)
+                list_elem.append(number)
+
+
+
+    return list
+
+
 def graphic_visualization(request, project_id):
     project = Project.objects.get(id=project_id)
+    list_date = getDates()
+    tabStatus = getStatus(project)
+    list_count_for_status = getCountStatus(tabStatus, list_date)
+
     context = {
-        'project': project
+        'project': project,
+        'status': tabStatus
     }
     return render(request, 'manager_app/graphic_visualization.html', context)
+
+
+def getStatus(project):
+    status = project.status
+    tabStatus = []
+    tabStatus.append('no status')
+    tabStatus += status.split(";")
+    return tabStatus
+
+
+def project_chnology(project):
+
+    #date
+    now = datetime.datetime.now()
+    date_string = now.strftime("%d/%m/%Y")
+
+    #tasks
+    tasks = Task.objects.all()
+
+    #status
+    tabStatus = getStatus(project)
+
+
+    #traitement
+    content = ""
+    with open('D:\ecole\Q1-Q2-Q3-Q4\Q 3\web 2\project_chnology.txt', 'r') as f:
+        for line in f:
+            content += line
+            if date_string in line:
+                break
+
+
+
+    with open('D:\ecole\Q1-Q2-Q3-Q4\Q 3\web 2\project_chnology.txt', 'w') as f:
+        f.truncate()
+        f.write(content)
+
+        for status in tabStatus:
+            #print("pour ", status)
+            count = 0
+            for task in tasks:
+                if project == task.project:
+                    if status == task.status_task:
+                        count += 1
+            f.write(status+':'+str(count)+'\n')
