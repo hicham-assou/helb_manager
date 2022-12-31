@@ -6,7 +6,7 @@ from django.views.generic import DetailView, CreateView, UpdateView, DeleteView,
 from .models import Project, User, Task
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .filter import Filter
-from .forms import TaskForm
+from .forms import TaskForm, SubTaskForm
 
 import random
 import datetime
