@@ -55,7 +55,6 @@
   {% if object.author == user %}
 <div>
   <a href="{% url 'add_task' project.id %}" class="btn btn-secondary btn-sm mt-1 mb-1">Add Task</a>
-  <a href="{% url 'add_sub_task' project.id %}" class="btn btn-secondary btn-sm mt-1 mb-1">Add Sub Task</a>
   <a href="{% url 'graphic-visualization' project.id %}" class="btn btn-secondary btn-sm mt-1 mb-1">graphic visualization</a>
 
 </div>

@@ -1,0 +1,21 @@
+06/01/2023
+
+no status:8
+to do:5
+ in progress:6
+ done:3
+  revision:1
+05/01/2023
+
+no status:1
+to do:2
+ in progress:9
+ done:5
+  revision:4
+06/01/2023
+
+no status:1
+to do:2
+ in progress:3
+ done:1
+  revision:4
