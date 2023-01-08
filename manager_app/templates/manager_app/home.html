@@ -1,6 +1,7 @@
 {% extends "manager_app/base.html" %}
 
 {% block content %}
+
 <div class="row">
     <div class="col">
         <div class="card card-body">
@@ -11,7 +12,7 @@
         </div>
     </div>
 </div>
-
+{% if user.is_authenticated %}
 {% for project in filters.qs %}
     {% if user.username in project.collaborators or user == project.author %} <!-- afficher que les projet qui le concernent -->
     <article class="media content-section">
@@ -26,5 +27,8 @@
     </article>
     {% endif %}
 {% endfor %}
+{% else %}
 
+<p>You must be logged in to see the projects.</p>
+{% endif %}
 {% endblock content %}

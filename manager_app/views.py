@@ -88,6 +88,7 @@ def add_task(request, project_id):
 
     return render(request, 'manager_app/add_task.html', {'form': form})
 
+
 class ProjectListView(LoginRequiredMixin, ListView):  # affichage de tous les projets (home.html)
     model = Project
     template_name = 'manager_app/home.html'  # <app>/<model>_<viewtype>.html

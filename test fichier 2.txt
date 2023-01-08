@@ -1,6 +1,0 @@
-31/12/2022
-
-no status:1
-to do:3
- revision:0
- in progress:0
